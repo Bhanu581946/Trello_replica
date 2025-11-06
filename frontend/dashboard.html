@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>User Info and Logout</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: lightgray;
+      padding: 20px;
+    }
+    button {
+      background-color: #001f5c;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      font-size: 16px;
+    }
+    button:hover {
+      background-color: #000d33;
+    }
+  </style>
+</head>
+<body>
+  <h3>User Data</h3>
+  <div id="userInfo">
+    <p><strong>Username:</strong></p>
+    <p><strong>Email:</strong></p>
+  </div>
+
+  <br />
+  <button id="logout-btn">Logout</button>
+  <br>
+
+  <script>
+    async function loadUser() {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        alert("Please login first");
+        window.location.href = "login.html";
+        return;
+      }
+
+      const response = await fetch("http://127.0.0.1:8000/me", {
+        method: "GET",
+        headers: {
+          "Authorization": "Bearer " + token
+        }
+      });
+
+      if (response.ok) {
+        const user = await response.json();
+        document.getElementById("userInfo").innerHTML =
+          `<p><strong>Username:</strong> ${user.username}</p>
+           <p><strong>Email:</strong> ${user.email}</p>`;
+      } else {
+        alert("Session expired. Please login again.");
+        localStorage.removeItem("token");
+        window.location.href = "login.html";
+      }
+    }
+
+    document.getElementById("logout-btn").addEventListener("click", () => {
+      localStorage.removeItem("token");
+      window.location.href = "login.html";
+    });
+
+    loadUser();
+  </script>
+</body>
+</html>

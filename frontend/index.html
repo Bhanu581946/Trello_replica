@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>FastAPI Auth UI</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app">
+    <header class="header">
+      <h1>FastAPI Auth Demo</h1>
+      <p class="hint">Backend: <code>http://127.0.0.1:8000</code></p>
+    </header>
+
+    <main class="grid">
+      <!-- Signup Card -->
+      <section class="card">
+        <h2>Sign Up</h2>
+        <form id="signupForm" autocomplete="on">
+          <div class="field">
+            <label for="su_username">Username</label>
+            <input id="su_username" name="username" type="text" required />
+          </div>
+          <div class="field">
+            <label for="su_email">Email</label>
+            <input id="su_email" name="email" type="email" required />
+          </div>
+          <div class="field">
+            <label for="su_password">Password</label>
+            <input id="su_password" name="password" type="password" required />
+          </div>
+          <button type="submit" class="btn primary">Create account</button>
+          <p class="hint">Creates a user via <code>POST /signup</code></p>
+        </form>
+      </section>
+
+      <!-- Login Card -->
+      <section class="card">
+        <h2>Log In</h2>
+        <form id="loginForm" autocomplete="on">
+          <div class="field">
+            <label for="li_username">Username</label>
+            <input id="li_username" name="username" type="text" required />
+          </div>
+          <div class="field">
+            <label for="li_password">Password</label>
+            <input id="li_password" name="password" type="password" required />
+          </div>
+          <button type="submit" class="btn primary">Log in</button>
+          <p class="hint">
+            Exchanges credentials for a JWT via
+            <code>POST /login</code> (form-encoded)
+          </p>
+        </form>
+
+        <div class="tokenBox">
+          <label>Access Token</label>
+          <textarea id="accessToken" readonly rows="4" placeholder="Login to get your token..."></textarea>
+          <div class="row">
+            <button id="copyToken" class="btn">Copy</button>
+            <button id="clearToken" class="btn danger">Logout</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Me Card -->
+      <section class="card">
+        <h2>My Profile</h2>
+        <div class="row">
+          <button id="btnMe" class="btn primary">Fetch /me</button>
+        </div>
+        <pre id="meOutput" class="output">No data yet.</pre>
+        <p class="hint">Requires Authorization header: <code>Bearer &lt;token&gt;</code></p>
+      </section>
+    </main>
+  </div>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
