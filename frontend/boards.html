@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Your Boards</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f2f2f2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-top: 40px;
+    }
+    h2 {
+      color: black;
+      margin-bottom: 15px;
+    }
+    .container {
+      background: white;
+      padding: 25px;
+      border-radius: 8px;
+      width: 360px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
+    }
+    input[type="text"] {
+      width: 100%;
+      padding: 8px;
+      margin: 8px 0 15px 0;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    button {
+      background: #4285f4;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      width: 100%;
+      padding: 10px;
+      font-size: 15px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: darkblue;
+    }
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    li {
+      background: #f9f9f9;
+      padding: 10px;
+      border-radius: 4px;
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .logout {
+      color: red;
+      margin-top: 10px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <h2>My Boards</h2>
+
+  <!-- Create Board -->
+
+  <div class="container">
+    <h3>Create a Board</h3>
+    <input type="text" id="boardName" placeholder="Enter board name" />
+    <button id="createBoardBtn">Create Board</button>
+  </div>
+  <!-- Invite Member -->
+  <div class="container">
+    <h3>Invite Member to a Board</h3>
+    <input type="text" id="boardId" placeholder="Enter board ID" />
+    <input type="text" id="inviteUser" placeholder="Enter username or email" />
+
+  <!-- 👇 New Dropdown for Role -->
+    <label for="userRole">Role:</label><br>
+    <select id="userRole" style="width: 150px; padding: 6px; margin-left: 10px; border: 1px solid #ccc; border-radius: 4px;">
+      <option value="member">Member</option>
+       <option value="owner">Owner</option>
+       <option value="viewer">Viewer</option>
+    </select>
+    <br><br>
+    <button id="inviteBtn">Invite</button>
+  </div>
+
+  <p class="logout" id="logoutBtn">Logout</p>
+
+  <script>
+    const API = "http://127.0.0.1:8000";
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+      alert("Please login first!");
+      window.location.href = "login.html";
+    }
+
+    function authHeaders() {
+      return {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer " + token,
+      };
+    }
+
+    // Load Boards (All)
+    async function loadBoards() {
+      const res = await fetch(`${API}/boards/all`, { headers: authHeaders() });
+      const data = await res.json();
+      const list = document.getElementById("boardList");
+      list.innerHTML = "";
+
+      if (data.length === 0) {
+        list.innerHTML = "<li>No boards found.</li>";
+        return;
+      }
+
+      data.forEach(board => {
+        const li = document.createElement("li");
+        li.innerHTML = `<span>${board.name} (${board.role})</span> <span>ID: ${board.id}</span>`;
+        list.appendChild(li);
+      });
+    }
+
+    // Create Board
+    document.getElementById("createBoardBtn").addEventListener("click", async () => {
+      const name = document.getElementById("boardName").value.trim();
+      if (!name) return alert("Please enter board name.");
+
+      const res = await fetch(`${API}/boards/`, {
+        method: "POST",
+        headers: authHeaders(),
+        body: JSON.stringify({ name }),
+      });
+
+      if (res.ok) {
+        alert("Board created successfully!");
+        document.getElementById("boardName").value = "";
+        loadBoards();
+      } else {
+        const err = await res.json();
+        alert("Error: " + (err.detail || "Failed to create board"));
+      }
+    });
+
+    // Invite Member
+    document.getElementById("inviteBtn").addEventListener("click", async () => {
+      const boardId = document.getElementById("boardId").value.trim();
+      const usernameOrEmail = document.getElementById("inviteUser").value.trim();
+      const role = document.getElementById("userRole").value;
+
+      if (!boardId || !usernameOrEmail) return alert("Please enter both Board ID and Username/Email.");
+
+      const res = await fetch(`${API}/boards/${boardId}/invite`, {
+        method: "POST",
+        headers: authHeaders(),
+        body: JSON.stringify({ username_or_email: usernameOrEmail }),
+        role: role,
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        alert(data.message);
+        document.getElementById("boardId").value = "";
+        document.getElementById("inviteUser").value = "";
+      } else {
+        alert("Error: " + data.detail);
+      }
+    });
+
+    // Logout
+    document.getElementById("logoutBtn").addEventListener("click", () => {
+      localStorage.removeItem("token");
+      alert("Logged out!");
+      window.location.href = "login.html";
+    });
+
+    // Load on page open
+    loadBoards();
+  </script>
+
+</body>
+</html>

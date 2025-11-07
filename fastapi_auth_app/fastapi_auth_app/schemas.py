@@ -44,3 +44,7 @@ class ShowTask(BaseModel):
     status: str
     class Config:
         from_attributes = True
+
+class InviteMember(BaseModel):
+    username_or_email: str
+    role: str = "member"        # default value

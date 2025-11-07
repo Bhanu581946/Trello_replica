@@ -63,21 +63,28 @@
     <input type="password" id="password" name="password" required><br><br>
     <input type="submit" value="Login">
   </form>
-   <p>Create an account? <a href="dashboard.html">Register</a></p>
+    <p>Create an account? <a href="register.html">Register</a></p>
   <script>
     document.getElementById("loginForm").addEventListener("submit", async (e) => {
       e.preventDefault();
 
-      const formData = new FormData();
-      formData.append("username", document.getElementById("username").value);
-      formData.append("password", document.getElementById("password").value);
+      const body = new URLSearchParams();
+      body.append("username", username)
+      body.append("password", password)
 
-      const response = await fetch("http://127.0.0.1:8000/login/", {
+      const response = await fetch("http://127.0.0.1:8000/users/login", {
         method: "POST",
-        body: formData,
-      });
+        headers: {
+          "Accept": "application/json",
+          "Content-Type": "application/x-www-form-urlencoded",
+      },
+        body: new URLSearchParams({
+          username: document.getElementById("username").value,
+          password: document.getElementById("password").value,
+        }),
+});
 
-      if (response.ok) {
+    if (response.ok) {
         const data = await response.json();
         // Save token in localStorage
         localStorage.setItem("token", data.access_token);
