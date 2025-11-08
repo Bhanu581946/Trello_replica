@@ -10,8 +10,9 @@ class User(Base):
     username = Column(String, unique=True, index=True)
     email = Column(String, unique=True, index=True)
     password = Column(String)
-
+    #Each user can have multiple boards, but every board has only one owner.
     boards = relationship("Board", back_populates="owner")
+    #Each user can be assigned many tasks, but each task belongs to only one user.
     tasks = relationship("Task", back_populates="assignee")
 
 class Board(Base):
@@ -20,8 +21,11 @@ class Board(Base):
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String)
     owner_id = Column(Integer, ForeignKey("users.id"))
+    #One user can own many boards, But each board has only one owner.
     owner = relationship("User", back_populates="boards")
+    #One Board can have many members (users).
     members = relationship("BoardMember", back_populates="board")
+    #One Board can have many tasks.
     tasks = relationship("Task", back_populates="board")
 
 class BoardMember(Base):
@@ -33,7 +37,8 @@ class BoardMember(Base):
     role = Column(String, default="member")
 
     board = relationship("Board", back_populates="members")
-    user = relationship("User")
+     #each BoardMember is linked to one Board, and that Board keeps track of all its members through the members relationship.
+    user = relationship("User")  #Each BoardMember represents one User.
 
 class Task(Base):
 
@@ -46,5 +51,5 @@ class Task(Base):
     board_id = Column(Integer, ForeignKey("boards.id"))
     assignee_id = Column(Integer, ForeignKey("users.id"))
 
-    board = relationship("Board", back_populates="tasks")
-    assignee = relationship("User", back_populates="tasks")
+    board = relationship("Board", back_populates="tasks")  #Many tasks belong to one board
+    assignee = relationship("User", back_populates="tasks")  #Many tasks can be assigned to one user
