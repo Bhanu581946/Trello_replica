@@ -14,7 +14,8 @@ def create_task(task: schemas.TaskCreate, db: Session = Depends(get_db), user: m
     if not membership:
         raise HTTPException(status_code=403, detail="You are not a member of this board")
 
-    new_task = models.Task(**task.dict())
+    # new_task = models.Task(**task.dict())
+    new_task = models.Task(**task.model_dump())
     db.add(new_task)
     db.commit()
     db.refresh(new_task)

@@ -30,7 +30,6 @@ def create_board(
         "role": new_member.role
     }
 
-
 @router.get("/owned", response_model=list[schemas.ShowBoard])
 def get_boards(db: Session = Depends(get_db), user: models.User = Depends(auth.get_current_user)):
     return db.query(models.Board).filter(models.Board.owner_id == user.id).all()
@@ -117,3 +116,29 @@ def invite_member(
         "member_role": new_member.role
     }
 
+#change Board Role
+@router.put("/role")
+def change_board_role(
+    board_id: int, 
+    role: schemas.RoleChange,
+    db: Session = Depends(get_db)
+):
+    #Find membership
+    member= (
+        db.query(models.BoardMember)
+       .filter(
+           models.BoardMember.board_id== board_id, models.BoardMember.user_id == role.user_id
+        )
+       .first()
+    )
+    
+    member.role= role.new_role
+    db.commit()
+
+    return{
+        "message": "Updated Role",
+        "user_id": role.user_id,
+        "board_id": board_id,
+        "new_role": member.role
+    }                          
+                           

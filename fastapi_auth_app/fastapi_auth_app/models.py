@@ -3,7 +3,6 @@ from sqlalchemy.orm import relationship
 from .database import Base
 
 class User(Base):
-    
     __tablename__ = "users"
 
     id = Column(Integer, primary_key=True, index=True)
@@ -41,7 +40,6 @@ class BoardMember(Base):
     user = relationship("User")  #Each BoardMember represents one User.
 
 class Task(Base):
-
     __tablename__ = "tasks"
 
     id = Column(Integer, primary_key=True, index=True)

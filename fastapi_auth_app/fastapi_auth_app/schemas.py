@@ -1,5 +1,5 @@
 from pydantic import BaseModel, EmailStr
-from typing import Optional, List
+from typing import Optional
 
 class UserCreate(BaseModel):
     username: str
@@ -48,3 +48,8 @@ class ShowTask(BaseModel):
 class InviteMember(BaseModel):
     username_or_email: str
     role: str = "member"        # default value
+
+class RoleChange(BaseModel):
+    user_id: int
+    new_role: str
+
