@@ -5,7 +5,7 @@ from ..database import get_db
 from fastapi.security import OAuth2PasswordRequestForm
 
 router = APIRouter(prefix="/users", tags=["Users"])
-
+ 
 @router.post("/register", response_model=schemas.ShowUser)
 def register(user: schemas.UserCreate, db: Session = Depends(get_db)):
     if db.query(models.User).filter(models.User.username == user.username).first():
