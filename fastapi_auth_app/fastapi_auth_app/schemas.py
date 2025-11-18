@@ -53,3 +53,8 @@ class RoleChange(BaseModel):
     user_id: int
     new_role: str
 
+class LoginRequest(BaseModel):
+    username: str 
+    email: EmailStr
+    password: str
+    login_type:str

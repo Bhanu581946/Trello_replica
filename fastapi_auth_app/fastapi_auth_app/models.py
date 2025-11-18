@@ -51,3 +51,13 @@ class Task(Base):
 
     board = relationship("Board", back_populates="tasks")  #Many tasks belong to one board
     assignee = relationship("User", back_populates="tasks")  #Many tasks can be assigned to one user
+    subtasks = relationship("Subtask", back_populates = "task") #1 Task has multiple Subtasks
+
+class Subtask(Base):
+    __tablename__ = "subtasks"
+
+    id = Column(Integer, primary_key = True)
+    title = Column(String)
+    task_id = Column(Integer, ForeignKey("tasks.id"))
+
+    task = relationship("Task", back_populates="subtasks") #many subtasks belong to a task
