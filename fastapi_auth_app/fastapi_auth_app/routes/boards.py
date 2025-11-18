@@ -51,29 +51,59 @@ def get_boards(db: Session = Depends(get_db), user: models.User = Depends(auth.g
     ]
     return result
 
-#change Board Role
 @router.put("/role")
-def change_board_role(
-    board_id: int, 
-    role: schemas.RoleChange,
+def change_member_role(
+    data: schemas.RoleChange,
+    current_user: models.User = Depends(auth.get_current_user),
     db: Session = Depends(get_db)
 ):
-    #Find membership
-    member= (
-        db.query(models.BoardMember)
-       .filter(
-           models.BoardMember.board_id== board_id, models.BoardMember.user_id == role.user_id
-        )
-       .first()
-    )
     
-    member.role= role.new_role
+     #1.Valid role check
+    
+    vaild_roles = ["Viewer","Owner", "Member"] 
+    if data.new_role not in vaild_roles:
+        raise HTTPException(status_code=400, detail="Invalid role")  
+    
+    # 2.Check Board exists?
+    
+    board = db.query(models.Board).filter(models.Board.id== data.board_id).first()
+    if not board: 
+        raise HTTPException(status_code = 404, detail ="Board not found")   
+    
+    #3.Current user Owner or only Owner can change roles
+
+    membership =(
+        db.query(models.BoardMember)
+        .filter(
+            models.BoardMember.board_id == data.board_id,
+            models.BoardMember.user_id == current_user.id,
+            models.BoardMember.role == "Owner"
+        ).first()
+    )
+    if not membership:
+        raise HTTPException(status_code=403, detail= "only owner can change roles")
+
+
+    #4.find user whose role will be changed
+    target_member = (
+        db.query(models.BoardMember)
+        .filter(
+            models.BoardMember.board_id == data.borad.id,
+            models.BoardMember.user_id == data.user.id
+        ).first()
+    )
+    if not target_member:
+        raise HTTPException(status_code=404, detail= "user is not a member pof this board")  
+
+    #update Role
+    target_member.role= data.new_role
     db.commit()
 
     return{
         "message": "Updated Role",
-        "user_id": role.user_id,
-        "board_id": board_id,
-        "new_role": member.role
+        "user_id": data.user_id,
+        "board_id": data.board_id,
+        "new_role": target_member.role
     }                          
-                           
+           
+               

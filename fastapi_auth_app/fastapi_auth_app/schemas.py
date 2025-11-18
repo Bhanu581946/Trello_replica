@@ -50,6 +50,7 @@ class InviteMember(BaseModel):
     role: str = "member"        # default value
 
 class RoleChange(BaseModel):
+    board_id: int
     user_id: int
     new_role: str
 

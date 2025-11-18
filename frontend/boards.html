@@ -75,11 +75,6 @@
     <input type="text" id="boardName" placeholder="Enter board name" />
     <button id="createBoardBtn">Create Board</button>
   </div>
-  <!-- Invite Member -->
-  <div class="container">
-    <h3>Invite Member to a Board</h3>
-    <input type="text" id="boardId" placeholder="Enter board ID" />
-    <input type="text" id="inviteUser" placeholder="Enter username or email" />
 
   <!-- 👇 New Dropdown for Role -->
     <label for="userRole">Role:</label><br>
@@ -150,31 +145,6 @@
       }
     });
 
-    // Invite Member
-    document.getElementById("inviteBtn").addEventListener("click", async () => {
-      const boardId = document.getElementById("boardId").value.trim();
-      const usernameOrEmail = document.getElementById("inviteUser").value.trim();
-      const role = document.getElementById("userRole").value;
-
-      if (!boardId || !usernameOrEmail) return alert("Please enter both Board ID and Username/Email.");
-
-      const res = await fetch(`${API}/boards/${boardId}/invite`, {
-        method: "POST",
-        headers: authHeaders(),
-        body: JSON.stringify({ username_or_email: usernameOrEmail }),
-        role: role,
-      });
-
-      const data = await res.json();
-
-      if (res.ok) {
-        alert(data.message);
-        document.getElementById("boardId").value = "";
-        document.getElementById("inviteUser").value = "";
-      } else {
-        alert("Error: " + data.detail);
-      }
-    });
 
     // Logout
     document.getElementById("logoutBtn").addEventListener("click", () => {
